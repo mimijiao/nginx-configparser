@@ -26,6 +26,14 @@ TEST_F(NginxStringConfigTest, EmptyConfig) {
   EXPECT_FALSE(ParseString(""));
 }
 
+// Test toString
+TEST(NginxConfigTest, ToStringSimple) {
+  NginxConfigStatement statement;
+  statement.tokens_.push_back("foo");
+  statement.tokens_.push_back("bar");
+  EXPECT_EQ("foo bar;\n", statement.ToString(0));
+}
+
 // Test config with 2 statements
 TEST_F(NginxStringConfigTest, TwoLineConfig) {
   EXPECT_TRUE(ParseString("foo bar;\nfizz buzz;"));
@@ -56,9 +64,21 @@ TEST_F(NginxStringConfigTest, BlockConfig) {
   EXPECT_EQ("listen", child_config_.statements_.at(0)->tokens_.at(0));
 }
 
+// Make sure config statements with mismatched braces don't pass
+TEST_F(NginxStringConfigTest, MismatchedBracesConfig) {
+  EXPECT_FALSE(ParseString("{"));
+  EXPECT_FALSE(ParseString("oops {"));
+  EXPECT_FALSE(ParseString("}"));
+  EXPECT_FALSE(ParseString("huh oops;\n}"));
+  EXPECT_FALSE(ParseString("eh {\n  I dontknow;"));
+}
+
 // Test an incorrect config
 TEST_F(NginxStringConfigTest, WrongConfig) {
   EXPECT_FALSE(ParseString("foo bar"));
+  EXPECT_FALSE(ParseString(";"));
+  EXPECT_FALSE(ParseString("{}"));
+  EXPECT_FALSE(ParseString("{ means nothing; }"));
 }
 
 // Test nested blocks
