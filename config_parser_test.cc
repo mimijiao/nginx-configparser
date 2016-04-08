@@ -21,6 +21,11 @@ TEST_F(NginxStringConfigTest, SimpleConfig) {
   EXPECT_EQ("foo", out_config_.statements_.at(0)->tokens_.at(0));
 }
 
+// Make sure empty config fails
+TEST_F(NginxStringConfigTest, EmptyConfig) {
+  EXPECT_FALSE(ParseString(""));
+}
+
 // Test config with 2 statements
 TEST_F(NginxStringConfigTest, TwoLineConfig) {
   EXPECT_TRUE(ParseString("foo bar;\nfizz buzz;"));
